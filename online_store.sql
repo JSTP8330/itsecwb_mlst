@@ -30,6 +30,10 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 ;
 
+-- Users credentials
+-- john_doe = password123
+-- admin_user = adminpass
+
 INSERT INTO `users` VALUES (1,'john_doe','ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f','customer','john@example.com','2025-07-20 17:18:35'),(2,'admin_user','713bfda78870bf9d1b261f565286f85e97ee614efe5f0faf7c34e7ca4f65baca','admin','admin@example.com','2025-07-20 17:18:35'),(3,'staff_user','bcb53b632fbbba88d20863a26a528240f3e5a8d936d722bde3c95ce398a9236d','staff','staff@example.com','2025-07-20 17:18:35');
 
 -- -- Audit log definer
@@ -41,7 +45,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `log_audit_action`(
     IN p_role VARCHAR(50),
     IN p_action VARCHAR(255),
     IN p_target_table VARCHAR(100),
-    IN p_target_id INTusers
+    IN p_target_id INT
 )
 BEGIN
     INSERT INTO audit_logs (user_id, role, action, target_table, target_id)
