@@ -55,7 +55,9 @@
   ini_set('display_startup_errors', 1);
   error_reporting(E_ALL);
   $currentPage = basename($_SERVER['PHP_SELF']);
+  include 'session.php';
   include 'config.php';
+  checkRole('admin');
   ?>
   <div class="dashboard-container">
     <?php include 'admin_sidebar.php'; ?>

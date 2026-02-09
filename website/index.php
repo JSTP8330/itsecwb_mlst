@@ -5,6 +5,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 // Database connection
+include 'session.php';
 include 'config.php';
 
 // Get featured products
@@ -127,7 +128,7 @@ include 'config.php';
     <!-- FOOTER --> 
     <?php include 'footer.php'; ?>
     <!-- /FOOTER --> 
-     
+
     <!-- jQuery Plugins -->
     <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>

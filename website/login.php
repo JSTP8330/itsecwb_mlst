@@ -49,7 +49,7 @@
   
           if ($hashed_password === $stored_hash) {
               $_SESSION['username'] = $username;
-              $_SESSION['role'] = $role; // Set role from database
+              $_SESSION['role'] = $role;
               ob_clean();
               echo "success";
           } else {

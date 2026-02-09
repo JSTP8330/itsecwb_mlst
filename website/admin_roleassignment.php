@@ -1,14 +1,7 @@
 <?php
-// MySQL connection
-$servername = "localhost";
-$username = "root";
-$password = "";
-$database = "online_store";
-
-$conn = new mysqli($servername, $username, $password, $database);
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+include 'session.php';
+include 'config.php'; // database connection
+checkRole('admin'); // Ensure only admins can access
 
 // Handle role update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_role'])) {

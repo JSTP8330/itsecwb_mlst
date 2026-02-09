@@ -1,13 +1,7 @@
 <?php
-session_start();
-
-// Only allow admin access
-// if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-//     echo "Access denied. You are not authorized to view this page.";
-//     exit;
-// }
-
+include 'session.php';
 include 'config.php'; // database connection
+checkRole('admin'); // Ensure only admins can access
 
 // Fetch audit logs
 $sql = "SELECT * FROM audit_logs ORDER BY change_time DESC";

@@ -8,21 +8,18 @@
 </head>
 <body>
   <?php 
-  session_start();
-  $currentPage = basename($_SERVER['PHP_SELF']);
-
   // Check if user is admin
-  // if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-  //     echo "Access denied. You are not authorized to view this page.";
-  //     exit;
-  // }
-
+  include 'session.php'; // session management 
   include 'config.php'; // db connection 
+
+  $currentPage = basename($_SERVER['PHP_SELF']);
   // Fetch statistics
-  $pending_orders = $conn->query("SELECT COUNT(*) as count FROM orders WHERE status = 'Pending'")->fetch_assoc()['count'];
-  $completed_orders = $conn->query("SELECT COUNT(*) as count FROM orders WHERE status = 'Completed'")->fetch_assoc()['count'];
-  $total_products = $conn->query("SELECT COUNT(*) as count FROM products")->fetch_assoc()['count'];
-  ?>
+  // $pending_orders = $conn->query("SELECT COUNT(*) as count FROM orders WHERE status = 'Pending'")->fetch_assoc()['count'];
+  // $completed_orders = $conn->query("SELECT COUNT(*) as count FROM orders WHERE status = 'Completed'")->fetch_assoc()['count'];
+  // $total_products = $conn->query("SELECT COUNT(*) as count FROM products")->fetch_assoc()['count'];
+
+  checkRole('admin'); // function from session.php to restrict access
+?>
 
   <div class="dashboard-container">
     <?php include 'admin_sidebar.php'; ?>
@@ -30,7 +27,7 @@
     <main class="main-content">
       <h1>Admin Dashboard</h1>
       
-      <div class="stats-container">
+      <!-- <div class="stats-container">
         <div class="stat-box pending">
           <h3>Pending Orders</h3>
           <p class="stat-number"><?php echo $pending_orders; ?></p>
@@ -42,7 +39,7 @@
         <div class="stat-box products">
           <h3>Total Products</h3>
           <p class="stat-number"><?php echo $total_products; ?></p>
-        </div>
+        </div> -->
       </div>
     </main>
   </div>
