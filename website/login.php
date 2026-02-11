@@ -96,9 +96,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <body>
 
   <div class="wrapper">
-      <?php if(isset($error_message)): ?>
-            <div class="alert alert-danger"><?php echo $error_message; ?></div>
-      <?php endif; ?>
+    <?php if (!empty($error_message)): ?>
+        <div style="color: red; text-align: center; margin-bottom: 10px;">
+            <?php echo htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8'); ?>
+        </div>
+    <?php endif;?>
     <form id="login-form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
       <h2>Login</h2>
         <div class="input-field">
