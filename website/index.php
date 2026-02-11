@@ -1,12 +1,16 @@
 <?php
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-// Database connection
-include 'session.php';
+// index.php
+session_start(); // Ensure session is started to access user data
 include 'config.php';
+
+// Optional: Redirect to login if not logged in
+if (!isset($_SESSION['username'])) {
+    header("Location: login.php");
+    exit();
+}
+
+$currentPage = "home";
 
 // Get featured products
 
