@@ -41,7 +41,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } else {
             $check->close();
             
-            $hashed = hash('sha256', $userpassword);
+            //HASH password w/ automatic salt
+            $hashed = password_hash($userpassword, PASSWORD_DEFAULT);
             
             // Insert new user
             $stmt = $conn->prepare("INSERT INTO users (username, email, phone_number, role, password_hash) VALUES (?, ?, ?, 'customer', ?)");
