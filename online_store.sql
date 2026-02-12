@@ -45,10 +45,10 @@ CREATE TABLE `login_attempts` (
 -- john_doe = password123
 -- admin_user = adminpass
 
-INSERT INTO `users` VALUES (1,'john_doe','ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f','customer','john@example.com','09971234567','2025-07-20 17:18:35'),(2,'admin_user','713bfda78870bf9d1b261f565286f85e97ee614efe5f0faf7c34e7ca4f65baca','admin','admin@example.com','09211239876','2025-07-20 17:18:35'),(3,'staff_user','bcb53b632fbbba88d20863a26a528240f3e5a8d936d722bde3c95ce398a9236d','staff','staff@example.com','09279876543','2025-07-20 17:18:35');
-
-
-
+INSERT INTO users VALUES 
+(1, 'john_doe', 'ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f', 'customer', 'john@example.com', '09971234567', 'uploads/profile_pictures/profile_john.jpg', '2025-07-20 17:18:35'),
+(2, 'admin_user', '713bfda78870bf9d1b261f565286f85e97ee614efe5f0faf7c34e7ca4f65baca', 'admin', 'admin@example.com', '09211239876', 'uploads/profile_pictures/profile_admin.jpg', '2025-07-20 17:18:35'),
+(3, 'staff_user', 'bcb53b632fbbba88d20863a26a528240f3e5a8d936d722bde3c95ce398a9236d', 'staff', 'staff@example.com', '09279876543', 'uploads/profile_pictures/profile_staff.jpg', '2025-07-20 17:18:35');
 
 -- -- Audit log definer
 
