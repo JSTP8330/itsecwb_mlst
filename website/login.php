@@ -2,15 +2,7 @@
 // login.php
 session_start();
 
-$servername = "localhost";
-$username_db = "root";
-$password_db = "";
-$database = "online_store";
-
-$conn = new mysqli($servername, $username_db, $password_db, $database);
-if ($conn->connect_error) {
-    die("Database connection failed"); // Changed to die() to stop execution
-}
+include("config.php");
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $username = $_POST['username'] ?? '';
