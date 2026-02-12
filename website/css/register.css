@@ -5,6 +5,7 @@
   box-sizing: border-box;
   font-family: "Open Sans", sans-serif;
 }
+
 body {
   display: flex;
   align-items: center;
@@ -13,6 +14,7 @@ body {
   width: 100%;
   padding: 0 10px;
 }
+
 body::before {
   content: "";
   position: absolute;
@@ -23,10 +25,10 @@ body::before {
   background-position: center;
   background-size: cover;
   background-color: rgba(0, 0, 0, 0.4); /* adjust the last value for darkness */
-
 }
+
 .wrapper {
-  width: 400px;
+  width: 700px;
   border-radius: 8px;
   padding: 30px;
   text-align: center;
@@ -34,20 +36,24 @@ body::before {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
+
 form {
   display: flex;
   flex-direction: column;
 }
+
 h2 {
   font-size: 2rem;
   margin-bottom: 20px;
   color: #fff;
 }
+
 .input-field {
   position: relative;
   border-bottom: 2px solid #ccc;
   margin: 15px 0;
 }
+
 .input-field label {
   position: absolute;
   top: 50%;
@@ -58,6 +64,7 @@ h2 {
   pointer-events: none;
   transition: 0.15s ease;
 }
+
 .input-field input {
   width: 100%;
   height: 40px;
@@ -67,12 +74,14 @@ h2 {
   font-size: 16px;
   color: #fff;
 }
+
 .input-field input:focus~label,
 .input-field input:valid~label {
   font-size: 0.8rem;
   top: 10px;
   transform: translateY(-120%);
 }
+
 .forget {
   display: flex;
   align-items: center;
@@ -80,16 +89,20 @@ h2 {
   margin: 25px 0 35px 0;
   color: #fff;
 }
+
 #remember {
   accent-color: #fff;
 }
+
 .forget label {
   display: flex;
   align-items: center;
 }
+
 .forget label p {
   margin-left: 8px;
 }
+
 .wrapper a {
   color: #efefef;
   text-decoration: none;
@@ -97,6 +110,7 @@ h2 {
 .wrapper a:hover {
   text-decoration: underline;
 }
+
 button {
   background: #fff;
   color: #000;
@@ -109,13 +123,110 @@ button {
   border: 2px solid transparent;
   transition: 0.3s ease;
 }
+
 button:hover {
   color: #fff;
   border-color: #fff;
   background: rgba(255, 255, 255, 0.15);
 }
+
 .register, .login {
   text-align: center;
   margin-top: 30px;
   color: #fff;
+}
+ /* efwefweui */
+.form-container {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+}
+
+.profile-upload-section {
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.profile-preview {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 0 auto 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.profile-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+}
+
+.profile-preview img.show {
+  display: block;
+}
+
+.profile-preview .placeholder {
+  font-size: 60px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.file-input-wrapper {
+  margin-top: 10px;
+}
+
+.file-input-wrapper label {
+  display: block;
+  margin-bottom: 10px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.file-input-wrapper input[type="file"] {
+  display: none;
+}
+
+.custom-file-upload {
+  display: inline-block;
+  padding: 10px 20px;
+  background: #ffffff31;
+  color: #333;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.3s;
+}
+
+.custom-file-upload:hover {
+  background: #f0f0f0;
+}
+
+.file-info {
+  margin-top: 10px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.4;
+}
+
+.form-fields-section {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .form-container {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .profile-upload-section {
+    width: 100%;
+  }
 }
