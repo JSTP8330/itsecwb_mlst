@@ -43,7 +43,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 
                 if ($stmt->fetch()) {
                     // Hash the submitted password
-                    $hashed_password = hash('sha256', $password);
+                   // verify password w/ salt
+                    if (password_verify($password, $stored_hash)) {;
             
                     if ($hashed_password === $stored_hash) {
                         // SUCCESS: Login
