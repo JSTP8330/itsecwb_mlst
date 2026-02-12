@@ -25,6 +25,7 @@ CREATE TABLE `users` (
   `role` enum('admin','staff','customer') NOT NULL,
   `email` varchar(100) DEFAULT NULL,
   `phone_number` varchar(20) DEFAULT NULL,
+  `profile_picture` varchar(255) DEFAULT NULL,
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `username` (`username`)
