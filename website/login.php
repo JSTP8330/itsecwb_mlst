@@ -9,6 +9,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $password = $_POST['password'] ?? '';
     $ip_address = $_SERVER['REMOTE_ADDR'];
 
+
     // --- BRUTE FORCE PROTECTION START ---
     // Check failed attempts in the last 15 minutes
     $check_stmt = $conn->prepare("SELECT COUNT(*) FROM login_attempts WHERE ip_address = ? AND attempt_time > (NOW() - INTERVAL 15 MINUTE)");
@@ -36,12 +37,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 if ($stmt->fetch()) {
                     // Hash the submitted password
                    // verify password w/ salt
-                    if (password_verify($password, $stored_hash)) {;
-            
-                    if ($hashed_password === $stored_hash) {
+                    if (password_verify($password, $stored_hash)) {
                         // SUCCESS: Login
                         $_SESSION['username'] = $username;
                         $_SESSION['role'] = $role;
+                        $_SESSION['user_id'] = $user_id;
                         
                         // Optional: Clear failed attempts on success
                         $stmt->close(); // Close previous statement first
