@@ -35,6 +35,7 @@ if ($conn->connect_error) {
                              <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'staff'): ?>
                                 <li><a href="staff_dash.php">Staff Panel</a></li>
                             <?php endif; ?>
+                            <li><a href="profile.php">Profile Page</a></li>
                             <li><a href="logout.php">Logout</a></li>
                         <?php endif; ?>
                     </ul>

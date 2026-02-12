@@ -1,7 +1,7 @@
 <?php
 
 // index.php
-session_start(); // Ensure session is started to access user data
+include 'session.php'; // Ensure session is started to access user data
 include 'config.php';
 
 // Optional: Redirect to login if not logged in

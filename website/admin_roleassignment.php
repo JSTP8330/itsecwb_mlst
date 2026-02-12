@@ -21,6 +21,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_role'])) {
     $stmt->close();
 }
 
+// Handle password change
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
+    $user_id = $conn->real_escape_string($_POST['user_id']);
+    $new_password = $_POST['new_password'];
+    $confirm_password = $_POST['confirm_password'];
+    
+    if (empty($new_password) || empty($confirm_password)) {
+        $error_message = "Password fields cannot be empty.";
+    } elseif ($new_password !== $confirm_password) {
+        $error_message = "Passwords do not match.";
+    } else {
+        $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
+        $stmt = $conn->prepare("UPDATE users SET password = ? WHERE user_id = ?");
+        $stmt->bind_param("si", $hashed_password, $user_id);
+        $stmt->execute();
+        
+        if ($stmt->affected_rows > 0) {
+            $success_message = "Password changed successfully!";
+        } else {
+            $error_message = "Failed to change password.";
+        }
+        
+        $stmt->close();
+    }
+}
+
 // Fetch all users from database
 $users = [];
 $query = "SELECT user_id, username, email, role, created_at FROM users ORDER BY created_at DESC";
@@ -109,14 +135,25 @@ if ($result) {
                 </td>
                 <td><?= htmlspecialchars($user['created_at']) ?></td>
                 <td>
+                  <!-- Role Update Form -->
+                  <form method="POST" class="role-form mb-3">
+                    <input type="hidden" name="user_id" value="<?= $user['user_id'] ?>">
+                    <div class="d-flex align-items-center">
+                      <select name="new_role" class="form-control form-control-sm role-select">
+                        <option value="admin" <?= $user['role'] == 'admin' ? 'selected' : '' ?>>Admin</option>
+                        <option value="staff" <?= $user['role'] == 'staff' ? 'selected' : '' ?>>Staff</option>
+                        <option value="customer" <?= $user['role'] == 'customer' ? 'selected' : '' ?>>Customer</option>
+                      </select>
+                      <button type="submit" name="update_role" class="btn btn-sm btn-success ml-2">Update Role</button>
+                    </div>
+                  </form>
+                  <!-- Password Change Form -->
                   <form method="POST" class="role-form">
                     <input type="hidden" name="user_id" value="<?= $user['user_id'] ?>">
-                    <select name="new_role" class="form-control form-control-sm role-select">
-                      <option value="admin" <?= $user['role'] == 'admin' ? 'selected' : '' ?>>Admin</option>
-                      <option value="staff" <?= $user['role'] == 'staff' ? 'selected' : '' ?>>Staff</option>
-                      <option value="customer" <?= $user['role'] == 'customer' ? 'selected' : '' ?>>Customer</option>
-                    </select>
-                    <button type="submit" name="update_role" class="btn btn-sm btn-primary mt-1">Update</button>
+                    <div class="d-flex align-items-center">
+                      <input type="password" name="new_password" class="form-control form-control-sm mr-2" placeholder="New Password" required>
+                      <button type="submit" name="change_password" class="btn btn-sm btn-warning">Change Password</button>
+                    </div>
                   </form>
                 </td>
               </tr>
