@@ -10,7 +10,8 @@ It has been simplified to accommodate the scope of a security web development co
 Setup Instructions
 
 1. Clone/Copy Project Files  
-Copy the website folder to your XAMPP htdocs directory.
+
+- Copy the website folder to your XAMPP htdocs directory.
 
 2. Create Database  
 
