@@ -89,27 +89,45 @@
           if ($result) {
               while ($row = $result->fetch_array()) {
                   $table = $row[0];
-                  $column_result = $conn->query("SHOW COLUMNS FROM `$table`");
-                  $column_count = $column_result ? $column_result->num_rows : 0;
-                  $row_result = $conn->query("SELECT COUNT(*) as row_count FROM `$table`");
+                  
+                  // SECURITY: Validate table name to prevent SQL injection
+                  // Only allow alphanumeric characters and underscores
+                  if (!preg_match('/^[a-zA-Z0-9_]+$/', $table)) {
+                      continue; // Skip invalid table names
+                  }
+                  
+                  // Use parameterized query with information_schema for columns
+                  $col_stmt = $conn->prepare("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?");
+                  if ($col_stmt) {
+                      $col_stmt->bind_param("s", $table);
+                      $col_stmt->execute();
+                      $col_result = $col_stmt->get_result();
+                      $column_count = $col_result->num_rows;
+                      $col_stmt->close();
+                  } else {
+                      $column_count = 0;
+                  }
+                  
+                  // Query row count using escaped table name
+                  $row_result = $conn->query("SELECT COUNT(*) as row_count FROM `" . $conn->real_escape_string($table) . "`");
                   $row_count = $row_result ? $row_result->fetch_assoc()['row_count'] : 0;
+                  
                   echo "<tr>";
                   echo "<td>" . htmlspecialchars($table) . "</td>";
                   echo "<td>$column_count</td>";
                   echo "<td>$row_count</td>";
                   echo "<td>
-                          <button class='btn btn-sm btn-primary' onclick='editTable(\"$table\")'><i class='fas fa-pen'></i> Edit</button>
-                          <button class='btn btn-sm btn-info' onclick='addColumn(\"$table\")'><i class='fas fa-columns'></i> Add Column</button>
-                          <button class='btn btn-sm btn-warning' onclick='addRow(\"$table\")'><i class='fas fa-plus'></i> Add Row</button>
-                          <button class='btn btn-sm btn-danger' onclick='deleteTable(\"$table\")'><i class='fas fa-trash'></i> Delete</button>
+                          <button class='btn btn-sm btn-primary' onclick='editTable(" . json_encode($table) . ")'><i class='fas fa-pen'></i> Edit</button>
+                          <button class='btn btn-sm btn-info' onclick='addColumn(" . json_encode($table) . ")'><i class='fas fa-columns'></i> Add Column</button>
+                          <button class='btn btn-sm btn-warning' onclick='addRow(" . json_encode($table) . ")'><i class='fas fa-plus'></i> Add Row</button>
+                          <button class='btn btn-sm btn-danger' onclick='deleteTable(" . json_encode($table) . ")'><i class='fas fa-trash'></i> Delete</button>
                         </td>";
                   echo "</tr>";
-                  if ($column_result) $column_result->free();
                   if ($row_result) $row_result->free();
               }
               $result->free();
           } else {
-              echo "<tr><td colspan='4'>Error fetching tables: " . htmlspecialchars($conn->error) . "</td></tr>";
+              echo "<tr><td colspan='4'>An error occurred while fetching tables.</td></tr>";
           }
           ?>
         </tbody>
