@@ -38,7 +38,7 @@ if ($conn->connect_error) {
                                 <li><a href="admin_dash.php">Admin Panel</a></li>
                             <?php endif; ?>
                              <?php if (SHOW_PHASE3_NAV_LINKS && isset($_SESSION['role']) && $_SESSION['role'] === 'staff'): ?>
-                                <li><a href="staff_dash.php">Staff Panel</a></li>
+                                <li><a href="admin_dash.php">Staff Panel</a></li>
                             <?php endif; ?>
                             <li><a href="profile.php">Profile Page</a></li>
                             <li><a href="logout.php">Logout</a></li>
@@ -89,6 +89,7 @@ if ($conn->connect_error) {
                     <div class="header-ctn">
 
                         <!-- Cart -->
+                        <?php if (SHOW_PHASE3_NAV_LINKS): ?>
                         <div class="dropdown">
                             <a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
                                 <i class="fa fa-shopping-cart"></i>
@@ -102,6 +103,7 @@ if ($conn->connect_error) {
                                 </div>
                             </div>
                         </div>
+                        <?php endif; ?>
                         <!-- /Cart -->
 
                         <!-- Menu Toggle -->

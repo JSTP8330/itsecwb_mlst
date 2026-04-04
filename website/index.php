@@ -82,7 +82,7 @@ $currentPage = "home";
                         </div>
                         <div class="shop-body">
                             <h3>Keyboard<br>Collection</h3>
-                            <a href="store.php?category_id=2" class="cta-btn">Shop now <i class="fa fa-arrow-circle-right"></i></a>
+                            <a href="store.php?category_id=keyboards" class="cta-btn">Shop now <i class="fa fa-arrow-circle-right"></i></a>
                         </div>
                     </div>
                 </div>
@@ -95,7 +95,7 @@ $currentPage = "home";
                         </div>
                         <div class="shop-body">
                             <h3>Headphone<br>Collection</h3>
-                            <a href="store.php?category_id=4" class="cta-btn">Shop now <i class="fa fa-arrow-circle-right"></i></a>
+                            <a href="store.php?category_id=headphones" class="cta-btn">Shop now <i class="fa fa-arrow-circle-right"></i></a>
                         </div>
                     </div>
                 </div>
@@ -108,7 +108,7 @@ $currentPage = "home";
                         </div>
                         <div class="shop-body">
                             <h3>Monitor<br>Collection</h3>
-                            <a href="store.php?category_id=3" class="cta-btn">Shop now <i class="fa fa-arrow-circle-right"></i></a>
+                            <a href="store.php?category_id=monitors" class="cta-btn">Shop now <i class="fa fa-arrow-circle-right"></i></a>
                         </div>
                     </div>
                 </div>
@@ -121,7 +121,7 @@ $currentPage = "home";
                         </div>
                         <div class="shop-body">
                             <h3>Mouse<br>Collection</h3>
-                            <a href="store.php?category_id=1" class="cta-btn">Shop now <i class="fa fa-arrow-circle-right"></i></a>
+                            <a href="store.php?category_id=mice" class="cta-btn">Shop now <i class="fa fa-arrow-circle-right"></i></a>
                         </div>
                     </div>
                 </div>

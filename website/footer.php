@@ -22,10 +22,10 @@
 							<div class="footer">
 								<h3 class="footer-title">Categories</h3>
 								<ul class="footer-links">
-									<li><a href="store.php">Keyboards</a></li>
-									<li><a href="store.php">Headphones</a></li>
-									<li><a href="store.php">Monitors</a></li>
-									<li><a href="store.php">Mice</a></li>
+									<li><a href="store.php?category_id=keyboards">Keyboards</a></li>
+									<li><a href="store.php?category_id=headphones">Headphones</a></li>
+									<li><a href="store.php?category_id=monitors">Monitors</a></li>
+									<li><a href="store.php?category_id=mice">Mice</a></li>
 								</ul>
 							</div>
 						</div>

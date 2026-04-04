@@ -18,6 +18,7 @@ echo "<pre>";
 echo "Hashed password for john_doe: $hashed_password_john\n";
 echo "Hashed password for admin_user: $hashed_password_admin\n";
 echo "Hashed password for staff_user: $hashed_password_staff\n";
+echo "\n(Product catalog seed: use the INSERT block at the end of ../online_store.sql — see README Phase 3A / website/sql/phase3a_seed_products.sql.)\n";
 echo "</pre>";
 
 // Database connection details

@@ -5,7 +5,7 @@
  *
  * Phase 2 (see README):
  * - APP_DEBUG: env APP_DEBUG=0 or false for production-style errors (default true for local XAMPP).
- * - SHOW_PHASE3_NAV_LINKS: false hides store/category/staff/order links until Phase 3 pages exist.
+ * - SHOW_PHASE3_NAV_LINKS: when false, hides store/cart nav (see define below; default true after Phase 3A).
  * - Session idle 30m / max 24h when logged in.
  */
 
@@ -14,7 +14,7 @@ if (!defined('APP_DEBUG')) {
     define('APP_DEBUG', $d === false ? true : filter_var($d, FILTER_VALIDATE_BOOLEAN));
 }
 if (!defined('SHOW_PHASE3_NAV_LINKS')) {
-    define('SHOW_PHASE3_NAV_LINKS', false);
+    define('SHOW_PHASE3_NAV_LINKS', true);
 }
 
 if (!function_exists('app_password_hash')) {
@@ -138,6 +138,19 @@ if (!isset($_SESSION['username'])) {
 
 function checkRole($requiredRole) {
     if (!isset($_SESSION['role']) || $_SESSION['role'] !== $requiredRole) {
+        echo "Access denied. You do not have permission to view this page.";
+        exit;
+    }
+}
+
+/** Admin or staff: catalog + order operations (Phase 3B). */
+function checkStaffOrAdmin(): void {
+    if (!isset($_SESSION['role'])) {
+        echo "Access denied. You do not have permission to view this page.";
+        exit;
+    }
+    $r = $_SESSION['role'];
+    if ($r !== 'admin' && $r !== 'staff') {
         echo "Access denied. You do not have permission to view this page.";
         exit;
     }
