@@ -3,47 +3,64 @@ include 'session.php';
 include 'config.php'; // database connection
 checkRole('admin'); // Ensure only admins can access
 
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
+function admin_csrf_ok() {
+    $t = $_POST['csrf_token'] ?? '';
+    return is_string($t) && hash_equals($_SESSION['csrf_token'], $t);
+}
+
 // Handle role update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_role'])) {
-    $user_id = $conn->real_escape_string($_POST['user_id']);
-    $new_role = $conn->real_escape_string($_POST['new_role']);
-    
-    $stmt = $conn->prepare("UPDATE users SET role = ? WHERE user_id = ?");
-    $stmt->bind_param("si", $new_role, $user_id);
-    $stmt->execute();
-    
-    if ($stmt->affected_rows > 0) {
-        $success_message = "Role updated successfully!";
+    if (!admin_csrf_ok()) {
+        $error_message = "Invalid security token. Please refresh the page and try again.";
     } else {
-        $error_message = "Failed to update role or no changes made.";
+        $user_id = $conn->real_escape_string($_POST['user_id']);
+        $new_role = $conn->real_escape_string($_POST['new_role']);
+
+        $stmt = $conn->prepare("UPDATE users SET role = ? WHERE user_id = ?");
+        $stmt->bind_param("si", $new_role, $user_id);
+        $stmt->execute();
+
+        if ($stmt->affected_rows > 0) {
+            $success_message = "Role updated successfully!";
+        } else {
+            $error_message = "Failed to update role or no changes made.";
+        }
+
+        $stmt->close();
     }
-    
-    $stmt->close();
 }
 
 // Handle password change
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
-    $user_id = $conn->real_escape_string($_POST['user_id']);
-    $new_password = $_POST['new_password'];
-    $confirm_password = $_POST['confirm_password'];
-    
-    if (empty($new_password) || empty($confirm_password)) {
-        $error_message = "Password fields cannot be empty.";
-    } elseif ($new_password !== $confirm_password) {
-        $error_message = "Passwords do not match.";
+    if (!admin_csrf_ok()) {
+        $error_message = "Invalid security token. Please refresh the page and try again.";
     } else {
-        $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
-        $stmt = $conn->prepare("UPDATE users SET password_hash = ? WHERE user_id = ?");
-        $stmt->bind_param("si", $hashed_password, $user_id);
-        $stmt->execute();
-        
-        if ($stmt->affected_rows > 0) {
-            $success_message = "Password changed successfully!";
+        $user_id = $conn->real_escape_string($_POST['user_id']);
+        $new_password = $_POST['new_password'];
+        $confirm_password = $_POST['confirm_password'];
+
+        if (empty($new_password) || empty($confirm_password)) {
+            $error_message = "Password fields cannot be empty.";
+        } elseif ($new_password !== $confirm_password) {
+            $error_message = "Passwords do not match.";
         } else {
-            $error_message = "Failed to change password.";
+            $hashed_password = app_password_hash($new_password);
+            $stmt = $conn->prepare("UPDATE users SET password_hash = ? WHERE user_id = ?");
+            $stmt->bind_param("si", $hashed_password, $user_id);
+            $stmt->execute();
+
+            if ($stmt->affected_rows > 0) {
+                $success_message = "Password changed successfully!";
+            } else {
+                $error_message = "Failed to change password.";
+            }
+
+            $stmt->close();
         }
-        
-        $stmt->close();
     }
 }
 
@@ -137,6 +154,7 @@ if ($result) {
                 <td>
                   <!-- Role Update Form -->
                   <form method="POST" class="role-form mb-3">
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
                     <input type="hidden" name="user_id" value="<?= $user['user_id'] ?>">
                     <div class="d-flex align-items-center">
                       <select name="new_role" class="form-control form-control-sm role-select">
@@ -149,9 +167,11 @@ if ($result) {
                   </form>
                   <!-- Password Change Form -->
                   <form method="POST" class="role-form">
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
                     <input type="hidden" name="user_id" value="<?= $user['user_id'] ?>">
-                    <div class="d-flex align-items-center">
-                      <input type="password" name="new_password" class="form-control form-control-sm mr-2" placeholder="New Password" required>
+                    <div class="d-flex align-items-center flex-wrap">
+                      <input type="password" name="new_password" class="form-control form-control-sm mr-2 mb-1" placeholder="New Password" required>
+                      <input type="password" name="confirm_password" class="form-control form-control-sm mr-2 mb-1" placeholder="Confirm" required>
                       <button type="submit" name="change_password" class="btn btn-sm btn-warning">Change Password</button>
                     </div>
                   </form>

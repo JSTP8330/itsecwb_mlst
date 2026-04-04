@@ -51,9 +51,14 @@
 </head>
 <body>
   <?php
-  ini_set('display_errors', 1);
-  ini_set('display_startup_errors', 1);
-  error_reporting(E_ALL);
+  // Phase 2: only show PHP errors in browser when APP_DEBUG (see session.php / README)
+  if (defined('APP_DEBUG') && APP_DEBUG) {
+    ini_set('display_errors', '1');
+    ini_set('display_startup_errors', '1');
+    error_reporting(E_ALL);
+  } else {
+    ini_set('display_errors', '0');
+  }
   $currentPage = basename($_SERVER['PHP_SELF']);
   include 'session.php';
   include 'config.php';
