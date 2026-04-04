@@ -28,9 +28,11 @@ CREATE TABLE `users` (
   `profile_picture` varchar(255) DEFAULT NULL,
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_id`),
-  UNIQUE KEY `username` (`username`)
+  UNIQUE KEY `username` (`username`),
+  UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5;
-;
+
+-- If you already have a users table, add: ALTER TABLE users ADD UNIQUE KEY email (email);
 
 -- Login attempts for brute force detection
 CREATE TABLE `login_attempts` (
@@ -41,20 +43,21 @@ CREATE TABLE `login_attempts` (
   PRIMARY KEY (`attempt_id`)
 ) ENGINE=InnoDB;
 
--- -- Audit log definer
+-- Optional helper: matches audit_logs columns (table_name, action_type, record_id, changed_by, change_time)
+
+DROP PROCEDURE IF EXISTS `log_audit_action`;
 
 DELIMITER $$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `log_audit_action`(
-    IN p_user_id INT,
-    IN p_role VARCHAR(50),
-    IN p_action VARCHAR(255),
-    IN p_target_table VARCHAR(100),
-    IN p_target_id INT
+    IN p_table_name VARCHAR(50),
+    IN p_action_type VARCHAR(20),
+    IN p_record_id INT,
+    IN p_changed_by VARCHAR(100)
 )
 BEGIN
-    INSERT INTO audit_logs (user_id, role, action, target_table, target_id)
-    VALUES (p_user_id, p_role, p_action, p_target_table, p_target_id);
+    INSERT INTO audit_logs (table_name, action_type, record_id, changed_by)
+    VALUES (p_table_name, p_action_type, p_record_id, p_changed_by);
 END $$
 
 DELIMITER ;
