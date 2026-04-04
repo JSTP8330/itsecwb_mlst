@@ -1,4 +1,8 @@
 <?php
+// Phase 3: set SHOW_PHASE3_NAV_LINKS true in session.php when store pages exist
+if (!defined('SHOW_PHASE3_NAV_LINKS')) {
+    define('SHOW_PHASE3_NAV_LINKS', false);
+}
 // Get current selected category_id(s) from query string
 $current_categories = isset($_GET['category_id']) ? explode(',', $_GET['category_id']) : [];
 function buildCategoryUrl($newCategory) {
@@ -24,11 +28,13 @@ function isCategoryActive($category) {
 					<!-- NAV -->
 					<ul class="main-nav nav navbar-nav">
 					<li class="<?= ($currentPage == 'home') ? 'active' : '' ?>"><a href="index.php">Home</a></li>
+					<?php if (SHOW_PHASE3_NAV_LINKS): ?>
 					<li class="<?= ($currentPage == 'categories') ? 'active' : '' ?>"><a href="categoriespage.php">Categories</a></li>
 					<li class="<?= isCategoryActive(2) ?>"><a href="store.php?category_id=keyboards">Keyboards</a></li>
 					<li class="<?= isCategoryActive(4) ?>"><a href="store.php?category_id=headphones">Headphones</a></li>
 					<li class="<?= isCategoryActive(3) ?>"><a href="store.php?category_id=monitors">Monitors</a></li>
 					<li class="<?= isCategoryActive(1) ?>"><a href="store.php?category_id=mice">Mice</a></li>
+					<?php endif; ?>
 					</ul>
 					<!-- /NAV -->
 				</div>

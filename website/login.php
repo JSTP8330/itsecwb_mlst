@@ -1,6 +1,7 @@
 <?php
 // login.php
-session_start();
+define('ITSEC_SESSION_PUBLIC', true);
+require_once __DIR__ . '/session.php';
 
 include("config.php");
 
@@ -35,14 +36,25 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $stmt->bind_result($user_id, $stored_hash, $role);
                 
                 if ($stmt->fetch()) {
-                    // Hash the submitted password
-                   // verify password w/ salt
-                    if (password_verify($password, $stored_hash)) {
-                        // SUCCESS: Login
+                    $auth = app_password_login_check($password, $stored_hash);
+                    if ($auth['ok']) {
+                        // SUCCESS: Login (new session id mitigates session fixation)
+                        session_regenerate_id(true);
                         $_SESSION['username'] = $username;
                         $_SESSION['role'] = $role;
                         $_SESSION['user_id'] = $user_id;
-                        
+                        // Phase 2: session timeout anchors (see session.php)
+                        $t = time();
+                        $_SESSION['sess_started'] = $t;
+                        $_SESSION['last_activity'] = $t;
+
+                        if ($auth['upgrade_hash'] !== null) {
+                            $up = $conn->prepare("UPDATE users SET password_hash = ? WHERE user_id = ?");
+                            $up->bind_param("si", $auth['upgrade_hash'], $user_id);
+                            $up->execute();
+                            $up->close();
+                        }
+
                         // Optional: Clear failed attempts on success
                         $stmt->close(); // Close previous statement first
                         $clear_stmt = $conn->prepare("DELETE FROM login_attempts WHERE ip_address = ?");
@@ -109,7 +121,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
           <input type="checkbox" id="remember">
           <p>Remember me</p>
         </label>
-        <a href="change_password.php" onclick="alert('A password reset link has been sent to your email. Please follow the instructions well.');">Forgot password?</a>
+        <a href="change_password.php">Forgot password?</a>
       </div>
       <button type="submit">Log In</button>
       <div class="register">

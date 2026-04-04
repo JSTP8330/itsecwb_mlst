@@ -1,4 +1,7 @@
 <?php 
+if (!defined('SHOW_PHASE3_NAV_LINKS')) {
+    define('SHOW_PHASE3_NAV_LINKS', false);
+}
 include 'config.php';
 
 // Check connection
@@ -28,11 +31,13 @@ if ($conn->connect_error) {
                             <li><a href="login.php">Login</a></li>
                             <li><a href="register.php">Register</a></li>
                         <?php else: ?>
+                            <?php if (SHOW_PHASE3_NAV_LINKS): ?>
                             <li><a href="orderhistory.php">Order History</a></li>
+                            <?php endif; ?>
                             <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
                                 <li><a href="admin_dash.php">Admin Panel</a></li>
                             <?php endif; ?>
-                             <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'staff'): ?>
+                             <?php if (SHOW_PHASE3_NAV_LINKS && isset($_SESSION['role']) && $_SESSION['role'] === 'staff'): ?>
                                 <li><a href="staff_dash.php">Staff Panel</a></li>
                             <?php endif; ?>
                             <li><a href="profile.php">Profile Page</a></li>

@@ -1,5 +1,6 @@
 <?php 
 // register.php
+define('ITSEC_PASSWORD_ONLY', true);
 include("config.php");
 
 $error_message = ""; // Initialize variable
@@ -109,8 +110,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } else {
             $check->close();
             
-            //HASH password w/ automatic salt
-            $hashed = password_hash($userpassword, PASSWORD_DEFAULT);
+            // HASH: Argon2id (if available) + pepper (see session.php)
+            $hashed = app_password_hash($userpassword);
           
             $stmt = $conn->prepare("INSERT INTO users (username, email, phone_number, role, password_hash, profile_picture) VALUES (?, ?, ?, 'customer', ?, ?)");
             
@@ -126,10 +127,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     if ($profile_picture && file_exists($profile_picture)) {
                         unlink($profile_picture);
                     }
-                    
+                    $dup = ($stmt->errno === 1062);
+                    $err = $stmt->error;
                     $stmt->close();
                     $conn->close();
-                    echo "error: Registration failed - " . $stmt->error;
+                    // Phase 2: UNIQUE(email) duplicate = same user-facing message as username clash
+                    if ($dup) {
+                        echo "error: Username or Email already taken";
+                    } elseif (defined('APP_DEBUG') && APP_DEBUG) {
+                        echo "error: Registration failed - " . $err;
+                    } else {
+                        echo "error: Registration failed. Please try again.";
+                    }
                     exit;
                 }
             } else {
