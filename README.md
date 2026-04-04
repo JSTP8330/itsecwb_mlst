@@ -12,6 +12,7 @@ It has been simplified to accommodate the scope of a security web development co
 ## Milestone 1 patch-fixes before Milestone 2
 
 ### **Authentication & Passwords**
+
 * Removed unsafe email-only reset (`change_password.php` → contact admin page).
 * Login: `session_regenerate_id(true)` after success; forgot-password alert removed.
 * Passwords: Argon2id + optional pepper; legacy hashes auto-upgrade on login.
@@ -35,11 +36,39 @@ It has been simplified to accommodate the scope of a security web development co
 ### **Debug & UI**
 
 * `APP_DEBUG` default on local; off for generic browser messages, errors go to `error_log`.
-* `SHOW_PHASE3_NAV_LINKS=false` hides store/order/staff links until Phase 3 pages exist.
+* `SHOW_PHASE3_NAV_LINKS` (default **true** in `session.php`) toggles store/cart nav; set `false` to hide storefront links.
 
---
+---
 
-## Milestone 2 feature implementation (TBD)
+## Milestone 2 feature implementation
+
+### **Phase 3A — customer store (products, cart, checkout, order history)**
+
+* Pages: `store.php`, `product.php`, `categoriespage.php`, `cart.php`, `checkout.php`, `orderhistory.php`.
+* Cart is **session-based** (no `cart_items` table). Checkout uses a DB **transaction** (order + line items + stock decrement).
+* Successful orders write a row to `audit_logs` (`orders` / `order_placed`); failures log `checkout_failed`.
+* Store pages load helpers via **`website/includes/store_bootstrap.php`** (wraps `store_common.php`, `csrf.php`, `cart_session.php`, `audit_log.php`).
+* Phase 3B admin flows reuse the same DB tables (`products`, `orders`) and `website/includes/audit_log.php`.
+
+### **Phase 3B — admin & staff (catalog + orders)**
+
+* Products: `admin_products.php` — list, add, edit, activate/deactivate (`is_active`); CSRF on POST; `itsec_audit_log` for create/update/activate/deactivate.
+* Orders: `admin_dash.php` — stats (pending / completed / total products), recent orders, order status updates (`pending` / `completed` / `cancelled`); CSRF; audit `order_status_changed`.
+* Roles: Admin — full sidebar (Dashboard, Products, Audit logs, Role assignment). **Staff** — Dashboard + Products only (order/product ops); Audit & Role assignment hidden. `checkStaffOrAdmin()` in `session.php`; `checkRole('admin')` for sensitive pages.
+* Role assignment (`admin_roleassignment.php`): audit `user_role_changed`, `admin_password_reset` on success.
+* Sidebar: **Tables** link removed (no backend); `staff_dash.php` not used — header “Staff Panel” → `admin_dash.php`.
+
+### **Backlog**
+
+* Better UI/UX especially on the user side (order flow, feedback, visuals, accessibility).
+* Improvements planned for clearer order confirmation pages, user-friendly cart/checkout experience, and easier navigation.
+* Document Phase 3B: admin_products.php, staff vs admin sidebar, order status on admin_dash.php, audit action names.
+* Decide fate of admin_tables.php (implement with allowlists + CSRF, or remove/guard).
+* Note log_audit_action vs itsec_audit_log() (procedure optional; PHP is canonical).
+* Deployment: APP_PASSWORD_PEPPER, APP_DEBUG, HTTPS + cookie Secure.
+* Optional: login success/failure audit rows; refresh session role on profile or periodic check.
+* Optional: dedicated staff_dash.php redirect vs shared admin_dash.php (current behavior).
+
 
 ---
 
