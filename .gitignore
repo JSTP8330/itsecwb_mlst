@@ -1,0 +1,19 @@
+# OS junk
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Editor / IDE (delete the .vscode line if your team shares VS Code settings)
+.idea/
+.vscode/
+.cursor/
+
+# Local backups and dumps (matches your untracked backup/ folder)
+backup/
+*.bak
+*.dump
+
+# Logs and local env files
+*.log
+.env
+.env.*
