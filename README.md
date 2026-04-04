@@ -62,13 +62,27 @@ It has been simplified to accommodate the scope of a security web development co
 
 * Better UI/UX especially on the user side (order flow, feedback, visuals, accessibility).
 * Improvements planned for clearer order confirmation pages, user-friendly cart/checkout experience, and easier navigation.
+
 * Document Phase 3B: admin_products.php, staff vs admin sidebar, order status on admin_dash.php, audit action names.
 * Decide fate of admin_tables.php (implement with allowlists + CSRF, or remove/guard).
 * Note log_audit_action vs itsec_audit_log() (procedure optional; PHP is canonical).
+
 * Deployment: APP_PASSWORD_PEPPER, APP_DEBUG, HTTPS + cookie Secure.
 * Optional: login success/failure audit rows; refresh session role on profile or periodic check.
 * Optional: dedicated staff_dash.php redirect vs shared admin_dash.php (current behavior).
 
+| Requirement | Status |
+|-------------|--------|
+| SQL-based | Met |
+| Text + ≥2 numeric storage/display | Met |
+| Users ≥3 actions | Met |
+| Admin ≥3 admin-only actions | Met (audit + roles + password reset); clarify staff vs admin in write-ups |
+| Logging auth + txn + admin **to a log file** | **Partial** — DB audit + `login_attempts`; file mainly via `error_log` for errors |
+| Session timeout | Met |
+| Debug vs generic errors + **stack traces** | **Partial** — debug detail exists; **not** full stack traces broadly |
+| HTTPS | **Partial** — cookie flags; **prove** TLS in demo/docs |
+| Bonus syslog | No |
+| Bonus public SSL | N/A in repo |
 
 ---
 
