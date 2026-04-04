@@ -1,13 +1,18 @@
 <?php
+if (!defined('ITSEC_PASSWORD_ONLY')) {
+    define('ITSEC_PASSWORD_ONLY', true);
+}
+require_once __DIR__ . '/session.php';
+
 // Set passwords to be hashed
 $password_john = 'password123';
 $password_admin = 'adminpass';
 $password_staff = 'staffpass';
 
-// Hash passwords using PASSWORD_DEFAULT
-$hashed_password_john = password_hash($password_john, PASSWORD_DEFAULT);
-$hashed_password_admin = password_hash($password_admin, PASSWORD_DEFAULT);
-$hashed_password_staff = password_hash($password_staff, PASSWORD_DEFAULT);
+// Hash passwords (Argon2id + pepper when configured — same as the live app)
+$hashed_password_john = app_password_hash($password_john);
+$hashed_password_admin = app_password_hash($password_admin);
+$hashed_password_staff = app_password_hash($password_staff);
 
 echo "<pre>";
 echo "Hashed password for john_doe: $hashed_password_john\n";
