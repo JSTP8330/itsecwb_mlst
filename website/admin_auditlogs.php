@@ -6,6 +6,7 @@ checkRole('admin'); // Ensure only admins can access
 // Fetch audit logs
 $sql = "SELECT * FROM audit_logs ORDER BY change_time DESC";
 $result = $conn->query($sql);
+$currentPage = basename($_SERVER['PHP_SELF']);
 ?>
 <!DOCTYPE html>
 <html>
@@ -16,6 +17,7 @@ $result = $conn->query($sql);
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
+<div class="dashboard-container">
 <?php include 'admin_sidebar.php'; ?>
 
 <div class="main-content">
@@ -53,6 +55,7 @@ $result = $conn->query($sql);
             </tbody>
         </table>
     </div>
+</div>
 </div>
 </body>
 </html>

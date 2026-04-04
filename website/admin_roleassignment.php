@@ -1,6 +1,7 @@
 <?php
 include 'session.php';
 include 'config.php'; // database connection
+require_once __DIR__ . '/includes/audit_log.php';
 checkRole('admin'); // Ensure only admins can access
 
 if (empty($_SESSION['csrf_token'])) {
@@ -17,20 +18,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_role'])) {
     if (!admin_csrf_ok()) {
         $error_message = "Invalid security token. Please refresh the page and try again.";
     } else {
-        $user_id = $conn->real_escape_string($_POST['user_id']);
-        $new_role = $conn->real_escape_string($_POST['new_role']);
-
-        $stmt = $conn->prepare("UPDATE users SET role = ? WHERE user_id = ?");
-        $stmt->bind_param("si", $new_role, $user_id);
-        $stmt->execute();
-
-        if ($stmt->affected_rows > 0) {
-            $success_message = "Role updated successfully!";
+        $user_id = (int) ($_POST['user_id'] ?? 0);
+        $new_role = (string) ($_POST['new_role'] ?? '');
+        $allowed = ['admin', 'staff', 'customer'];
+        if ($user_id <= 0 || !in_array($new_role, $allowed, true)) {
+            $error_message = "Invalid user or role.";
         } else {
-            $error_message = "Failed to update role or no changes made.";
-        }
+            $stmt = $conn->prepare('UPDATE users SET role = ? WHERE user_id = ?');
+            $stmt->bind_param('si', $new_role, $user_id);
+            $stmt->execute();
 
-        $stmt->close();
+            if ($stmt->affected_rows > 0) {
+                $actor = (string) ($_SESSION['username'] ?? 'unknown');
+                itsec_audit_log($conn, 'users', 'user_role_changed', $user_id, $actor);
+                $success_message = "Role updated successfully!";
+            } else {
+                $error_message = "Failed to update role or no changes made.";
+            }
+
+            $stmt->close();
+        }
     }
 }
 
@@ -39,21 +46,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
     if (!admin_csrf_ok()) {
         $error_message = "Invalid security token. Please refresh the page and try again.";
     } else {
-        $user_id = $conn->real_escape_string($_POST['user_id']);
-        $new_password = $_POST['new_password'];
-        $confirm_password = $_POST['confirm_password'];
+        $user_id = (int) ($_POST['user_id'] ?? 0);
+        $new_password = $_POST['new_password'] ?? '';
+        $confirm_password = $_POST['confirm_password'] ?? '';
 
-        if (empty($new_password) || empty($confirm_password)) {
+        if ($user_id <= 0) {
+            $error_message = "Invalid user.";
+        } elseif (empty($new_password) || empty($confirm_password)) {
             $error_message = "Password fields cannot be empty.";
         } elseif ($new_password !== $confirm_password) {
             $error_message = "Passwords do not match.";
         } else {
             $hashed_password = app_password_hash($new_password);
-            $stmt = $conn->prepare("UPDATE users SET password_hash = ? WHERE user_id = ?");
-            $stmt->bind_param("si", $hashed_password, $user_id);
+            $stmt = $conn->prepare('UPDATE users SET password_hash = ? WHERE user_id = ?');
+            $stmt->bind_param('si', $hashed_password, $user_id);
             $stmt->execute();
 
             if ($stmt->affected_rows > 0) {
+                $actor = (string) ($_SESSION['username'] ?? 'unknown');
+                itsec_audit_log($conn, 'users', 'admin_password_reset', $user_id, $actor);
                 $success_message = "Password changed successfully!";
             } else {
                 $error_message = "Failed to change password.";
