@@ -2,6 +2,7 @@
 // profile.php
 include 'session.php'; // Ensure session is started to access user data
 include 'config.php';
+require_once __DIR__ . '/includes/image_sanitize.php';
 
 // Optional: Redirect to login if not logged in
 if (!isset($_SESSION['username'])) {
@@ -112,22 +113,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_profile_pictur
                         if (!move_uploaded_file($file['tmp_name'], $upload_path)) {
                             $picture_error = 'Failed to upload profile picture.';
                         } else {
-                            $old_path = $user['profile_picture'];
-                            $update = $conn->prepare('UPDATE users SET profile_picture = ? WHERE username = ?');
-                            if ($update === false) {
+                            $abs = __DIR__ . '/' . $upload_path;
+                            $re = itsec_reencode_profile_picture($abs, $file_extension);
+                            if ($re === null) {
                                 itsec_delete_stored_profile_picture($upload_path);
-                                $picture_error = 'Database error.';
+                                $picture_error = 'Invalid or unsupported image file.';
                             } else {
-                                $update->bind_param('ss', $upload_path, $username);
-                                if (!$update->execute()) {
+                                $upload_path = 'uploads/profile_pictures/' . basename($re);
+                                $old_path = $user['profile_picture'];
+                                $update = $conn->prepare('UPDATE users SET profile_picture = ? WHERE username = ?');
+                                if ($update === false) {
                                     itsec_delete_stored_profile_picture($upload_path);
-                                    $picture_error = 'Could not update profile.';
+                                    $picture_error = 'Database error.';
                                 } else {
-                                    itsec_delete_stored_profile_picture($old_path);
-                                    $user['profile_picture'] = $upload_path;
-                                    $picture_success = 'Profile picture updated.';
+                                    $update->bind_param('ss', $upload_path, $username);
+                                    if (!$update->execute()) {
+                                        itsec_delete_stored_profile_picture($upload_path);
+                                        $picture_error = 'Could not update profile.';
+                                    } else {
+                                        itsec_delete_stored_profile_picture($old_path);
+                                        $user['profile_picture'] = $upload_path;
+                                        $picture_success = 'Profile picture updated.';
+                                    }
+                                    $update->close();
                                 }
-                                $update->close();
                             }
                         }
                     }

@@ -2,6 +2,7 @@
 // register.php
 define('ITSEC_PASSWORD_ONLY', true);
 include("config.php");
+require_once __DIR__ . '/includes/image_sanitize.php';
 
 $error_message = ""; // Initialize variable
 
@@ -78,7 +79,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             $upload_path = $upload_directory . $unique_filename;
                             
                             if (move_uploaded_file($file['tmp_name'], $upload_path)) {
-                                $profile_picture = $upload_path;
+                                $abs = __DIR__ . '/' . $upload_path;
+                                $re = itsec_reencode_profile_picture($abs, $file_extension);
+                                if ($re === null) {
+                                    if (is_file($abs)) {
+                                        unlink($abs);
+                                    }
+                                    echo "error: Invalid or unsupported image file";
+                                    $conn->close();
+                                    exit;
+                                }
+                                $profile_picture = 'uploads/profile_pictures/' . basename($re);
                             } else {
                                 echo "error: Failed to upload profile picture";
                                 $conn->close();

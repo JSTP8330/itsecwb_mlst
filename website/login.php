@@ -4,6 +4,7 @@ define('ITSEC_SESSION_PUBLIC', true);
 require_once __DIR__ . '/session.php';
 
 include("config.php");
+require_once __DIR__ . '/includes/audit_log.php';
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $username = $_POST['username'] ?? '';
@@ -23,6 +24,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($failed_attempts >= 5) {
         // Block request
         $error_message = "Too many failed login attempts. Please try again in 15 minutes.";
+        itsec_app_log('auth', 'login_blocked', [
+            'ip' => $ip_address,
+            'username' => (string) ($_POST['username'] ?? ''),
+        ]);
     } else {
         // --- LOGIN ---
         if (!$username || !$password) {
@@ -62,6 +67,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         $clear_stmt->execute();
                         $clear_stmt->close();
 
+                        itsec_audit_log($conn, 'users', 'user_login', (int) $user_id, $username);
+                        itsec_app_log('auth', 'login_success', [
+                            'user_id' => (int) $user_id,
+                            'username' => $username,
+                            'ip' => $ip_address,
+                        ]);
+
                         header("Location: index.php"); // Redirect to home/dashboard
                         exit;
                     } else {
@@ -85,6 +97,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $log_stmt->bind_param("ss", $ip_address, $username);
             $log_stmt->execute();
             $log_stmt->close();
+            if (isset($error_message) && $error_message === 'Incorrect username or password') {
+                itsec_app_log('auth', 'login_failed', [
+                    'ip' => $ip_address,
+                    'username' => $username,
+                ]);
+            }
         }
     }
     // --- BRUTE FORCE PROTECTION END ---
