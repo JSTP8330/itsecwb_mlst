@@ -3,6 +3,22 @@ include 'session.php';
 include 'config.php'; // database connection
 checkRole('admin'); // Ensure only admins can access
 
+if (isset($_GET['download_app_log']) && $_GET['download_app_log'] === '1') {
+    require_once __DIR__ . '/includes/audit_log.php';
+    $path = itsec_app_log_resolve_path();
+    if (!is_readable($path)) {
+        http_response_code(404);
+        header('Content-Type: text/plain; charset=UTF-8');
+        echo 'Application log is not available yet.';
+        exit;
+    }
+    header('Content-Type: text/plain; charset=UTF-8');
+    header('Content-Disposition: attachment; filename="app.log"');
+    header('X-Content-Type-Options: nosniff');
+    readfile($path);
+    exit;
+}
+
 // Fetch audit logs
 $sql = "SELECT * FROM audit_logs ORDER BY change_time DESC";
 $result = $conn->query($sql);
@@ -22,6 +38,11 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 
 <div class="main-content">
     <h1 class="mb-4">Audit Logs</h1>
+
+    <p class="mb-3">
+      <a class="btn btn-secondary btn-sm" href="admin_auditlogs.php?download_app_log=1">Download application log (app.log)</a>
+      <span class="text-muted small ml-2">JSON lines; same events as below are mirrored here when DB audit succeeds.</span>
+    </p>
 
     <div class="table-responsive">
         <table class="table table-bordered table-hover table-striped">
