@@ -21,3 +21,12 @@ function itsec_csrf_validate(): bool {
         && is_string($t)
         && hash_equals($_SESSION['csrf_token'], $t);
 }
+
+/** Log CSRF failure (file + optional syslog); call when validate fails. */
+function itsec_csrf_fail_log(string $page): void {
+    require_once __DIR__ . '/audit_log.php';
+    itsec_app_log('security', 'csrf_validation_failed', [
+        'page' => $page,
+        'ip' => $_SERVER['REMOTE_ADDR'] ?? '',
+    ]);
+}
