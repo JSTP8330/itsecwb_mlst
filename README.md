@@ -58,13 +58,34 @@ It has been simplified to accommodate the scope of a security web development co
 * Role assignment (`admin_roleassignment.php`): audit `user_role_changed`, `admin_password_reset` on success.
 * Sidebar: **Tables** link removed (no backend); `staff_dash.php` not used — header “Staff Panel” → `admin_dash.php`.
 
+### **Phase 4 — logging, errors, admin stub, profile images**
+
+* Logging channels:
+  1. `audit_logs` (MySQL) via `itsec_audit_log()` for structured events (orders, catalog, roles, `user_login`).
+  2. `app.log` (file) mirrors successful audit events as JSON lines (`website/storage/logs/app.log`, override with `ITSEC_APP_LOG`). Also logs `auth`, `security`, and `exception`.
+  3. PHP `error_log` for engine/mysqli errors and uncaught exceptions (also written to `app.log`).
+* Auth events: Failed logins → `login_attempts` + `auth/login_failed`; brute-force → `login_blocked`; success → `auth/login_success` + audit `user_login`.
+* Admin download: `admin_auditlogs.php` provides “Download application log (app.log)” (streamed file, no path exposure).
+* Error handling: `includes/error_bootstrap.php` (loaded via `config.php`). `APP_DEBUG` shows short hint; otherwise generic message (full trace only in logs).
+* Admin tables: `admin_tables.php` is a disabled “coming soon” page (no schema editing UI).
+* Roles vs sessions: Self role change updates `$_SESSION['role']` immediately; other users keep old role until logout/session expiry.
+* Profile images: Re-encoded via GD as JPEG on register/profile (`includes/image_sanitize.php`) to strip polyglots; product images unchanged.
+
+### **Phase 5 — headers, syslog, configuration, TLS**
+
+* Security headers: `includes/security_headers.php` sets CSP (Report-Only), `X-Frame-Options: SAMEORIGIN`, and `Referrer-Policy: strict-origin-when-cross-origin` (loaded from `config.php`).
+* Syslog (optional): Enable with `APP_USE_SYSLOG=true`. Sends selected events (exceptions, `checkout_failed`, CSRF failures) via `syslog()`.
+* Environment vars: See `.env.example` (`APP_DEBUG`, `APP_PASSWORD_PEPPER`, `APP_USE_SYSLOG`, `ITSEC_APP_LOG`, DB settings). No dotenv loader; set via Apache/XAMPP or `secrets.php`.
+* HTTPS: Supports self-signed/mkcert locally. Session cookies use `secure` over HTTPS. Optional HTTP→HTTPS redirect may be disabled for grading.
+* XAMPP logs: PHP `error_log` (per `php.ini`, often `C:\xampp\php\logs\php_error_log`) and Apache error log (`C:\xampp\apache\logs\error.log`).
+
 ### **Backlog**
 
 * Better UI/UX especially on the user side (order flow, feedback, visuals, accessibility).
 * Improvements planned for clearer order confirmation pages, user-friendly cart/checkout experience, and easier navigation.
 
 * Document Phase 3B: admin_products.php, staff vs admin sidebar, order status on admin_dash.php, audit action names.
-* Decide fate of admin_tables.php (implement with allowlists + CSRF, or remove/guard).
+* `admin_tables.php` is a **disabled stub** (Phase 4); use SQL migrations instead of the old modal/AJAX UI.
 * Note log_audit_action vs itsec_audit_log() (procedure optional; PHP is canonical).
 
 * Deployment: APP_PASSWORD_PEPPER, APP_DEBUG, HTTPS + cookie Secure.
@@ -75,14 +96,15 @@ It has been simplified to accommodate the scope of a security web development co
 |-------------|--------|
 | SQL-based | Met |
 | Text + ≥2 numeric storage/display | Met |
-| Users ≥3 actions | Met |
-| Admin ≥3 admin-only actions | Met (audit + roles + password reset); clarify staff vs admin in write-ups |
-| Logging auth + txn + admin **to a log file** | **Partial** — DB audit + `login_attempts`; file mainly via `error_log` for errors |
-| Session timeout | Met |
-| Debug vs generic errors + **stack traces** | **Partial** — debug detail exists; **not** full stack traces broadly |
-| HTTPS | **Partial** — cookie flags; **prove** TLS in demo/docs |
-| Bonus syslog | No |
-| Bonus public SSL | N/A in repo |
+| Regular users ≥3 distinct actions | Met |
+| Admin ≥3 admin-only actions | Met (audit log viewer, role assignment, admin password reset; staff limited to dashboard + products) |
+| Logging auth + txn + admin **to a log file** | Met — `website/storage/logs/app.log` (JSON lines); auth includes `user_login` / `login_success`, failures, brute-force block; txn + admin mirrored when `itsec_audit_log()` succeeds; download from Audit Logs (`admin_auditlogs.php?download_app_log=1`) |
+| Session timeout | Met (`website/session.php`, idle 30m / max 24h) |
+| Debug vs generic errors + **stack traces** | Met — uncaught exceptions: full trace in `error_log` + app log (`error_bootstrap.php`); generic message in browser when `APP_DEBUG` is off |
+| HTTPS (self-signed acceptable) | Partial in repo — session cookie `Secure` when HTTPS; actual TLS is Apache / reverse-proxy setup (see README Phase 5) |
+| Bonus: syslog | Optional — `APP_USE_SYSLOG=true` forwards selected lines (`audit_log.php`: exceptions, `checkout_failed`, CSRF failures) |
+| Bonus: CSP / security headers | Met — `website/includes/security_headers.php` (CSP **Report-Only**, `X-Frame-Options`, `Referrer-Policy`) |
+| Bonus: public domain + valid SSL | N/A in repo (depends on deployment) |
 
 ---
 

@@ -15,5 +15,6 @@ backup/
 
 # Logs and local env files
 *.log
+website/storage/logs/*.log
 .env
 .env.*

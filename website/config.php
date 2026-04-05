@@ -16,4 +16,7 @@ if ($conn->connect_error) {
     error_log("DB connection failed: " . $conn->connect_error);
     die("Database unavailable. Please try again later.");
 }
+
+require_once __DIR__ . '/includes/error_bootstrap.php';
+require_once __DIR__ . '/includes/security_headers.php';
 ?>
