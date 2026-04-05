@@ -10,6 +10,7 @@ $flash = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!itsec_csrf_validate()) {
+        itsec_csrf_fail_log('cart.php');
         $flash = 'Invalid security token. Please refresh and try again.';
     } elseif (isset($_POST['update_cart'])) {
         $qtys = $_POST['qty'] ?? [];

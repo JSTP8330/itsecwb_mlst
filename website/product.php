@@ -16,6 +16,7 @@ $flash_err = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
     if (!itsec_csrf_validate()) {
+        itsec_csrf_fail_log('product.php');
         $flash_err = 'Invalid security token. Please refresh and try again.';
     } else {
         $qty = isset($_POST['quantity']) ? (int) $_POST['quantity'] : 0;

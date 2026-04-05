@@ -64,6 +64,7 @@ $lines = itsec_checkout_load_lines($conn, $cart);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
     if (!itsec_csrf_validate()) {
+        itsec_csrf_fail_log('checkout.php');
         $error_message = 'Invalid security token. Please refresh and try again.';
     } elseif (empty($lines)) {
         header('Location: cart.php');
