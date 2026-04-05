@@ -24,6 +24,8 @@ $allowed_statuses = ['pending', 'completed', 'cancelled'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_order_status'])) {
     if (!admin_dash_csrf_ok()) {
+        require_once __DIR__ . '/includes/csrf.php';
+        itsec_csrf_fail_log('admin_dash.php');
         $dash_error = 'Invalid security token. Please refresh the page and try again.';
     } else {
         $order_id = (int) ($_POST['order_id'] ?? 0);

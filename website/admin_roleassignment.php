@@ -2,6 +2,7 @@
 include 'session.php';
 include 'config.php'; // database connection
 require_once __DIR__ . '/includes/audit_log.php';
+require_once __DIR__ . '/includes/csrf.php';
 checkRole('admin'); // Ensure only admins can access
 
 if (empty($_SESSION['csrf_token'])) {
@@ -16,6 +17,7 @@ function admin_csrf_ok() {
 // Handle role update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_role'])) {
     if (!admin_csrf_ok()) {
+        itsec_csrf_fail_log('admin_roleassignment.php');
         $error_message = "Invalid security token. Please refresh the page and try again.";
     } else {
         $user_id = (int) ($_POST['user_id'] ?? 0);
@@ -31,6 +33,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_role'])) {
             if ($stmt->affected_rows > 0) {
                 $actor = (string) ($_SESSION['username'] ?? 'unknown');
                 itsec_audit_log($conn, 'users', 'user_role_changed', $user_id, $actor);
+                if ($user_id === (int) ($_SESSION['user_id'] ?? 0)) {
+                    $_SESSION['role'] = $new_role;
+                }
                 $success_message = "Role updated successfully!";
             } else {
                 $error_message = "Failed to update role or no changes made.";
@@ -44,6 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_role'])) {
 // Handle password change
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
     if (!admin_csrf_ok()) {
+        itsec_csrf_fail_log('admin_roleassignment.php');
         $error_message = "Invalid security token. Please refresh the page and try again.";
     } else {
         $user_id = (int) ($_POST['user_id'] ?? 0);

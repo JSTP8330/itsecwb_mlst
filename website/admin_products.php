@@ -22,6 +22,8 @@ $flash_error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!admin_products_csrf_ok()) {
+        require_once __DIR__ . '/includes/csrf.php';
+        itsec_csrf_fail_log('admin_products.php');
         $flash_error = 'Invalid security token. Please refresh the page and try again.';
     } elseif (isset($_POST['create_product'])) {
         $name = trim((string) ($_POST['name'] ?? ''));
