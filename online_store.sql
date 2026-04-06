@@ -4,6 +4,7 @@
 CREATE SCHEMA IF NOT EXISTS online_store;
 USE online_store;
 
+-- Milestone 1: audit logs, users and login attempts
 -- Audit logs table to track changes across the system
 DROP TABLE IF EXISTS `audit_logs`;
 CREATE TABLE `audit_logs` (
@@ -62,7 +63,7 @@ END $$
 
 DELIMITER ;
 
--- Milestone 2 (Phase 3): store tables (products, orders, order_items)
+-- Milestone 2: store tables (products, orders, order_items)
 
 CREATE TABLE `products` (
   `product_id` int NOT NULL AUTO_INCREMENT,
@@ -116,5 +117,3 @@ ON DUPLICATE KEY UPDATE
   `price` = VALUES(`price`),
   `stock` = VALUES(`stock`),
   `is_active` = VALUES(`is_active`);
-
--- Existing databases created before Phase 3A: run `website/sql/phase3a_products_category.sql` once, then copy the INSERT block above or see `website/sql/phase3a_seed_products.sql` for instructions.
