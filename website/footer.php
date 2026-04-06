@@ -32,18 +32,6 @@
 
 						<div class="clearfix visible-xs"></div>
 
-						<div class="col-md-3 col-xs-6">
-							<div class="footer">
-								<h3 class="footer-title">Information</h3>
-								<ul class="footer-links">
-									<li><a href="about.php">About Us</a></li>
-									<li><a href="contact.php">Contact Us</a></li>
-									<li><a href="privacy.php">Privacy Policy</a></li>
-									<li><a href="returns.php">Orders & Returns</a></li>
-									<li><a href="terms.php">Terms & Conditions</a></li>
-								</ul>
-							</div>
-						</div>
 
 						<div class="col-md-3 col-xs-6">
 							<div class="footer">
@@ -51,7 +39,9 @@
 								<ul class="footer-links">
 									<li><a href="cart.php">View Cart</a></li>
 									<li><a href="orderhistory.php">Track My Order</a></li>
-									<li><a href="service.php">Help</a></li>
+									<li>
+										<a href="#" onclick="alert('This page is not available yet. Please check back soon!'); return false;">Help</a>
+									</li>
 								</ul>
 							</div>
 						</div>
